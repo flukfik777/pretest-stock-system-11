@@ -95,6 +95,9 @@ foreach ($products as $p) {
                     (<?php echo ucfirst($currentUser['role']); ?>)
                 </span>
             </div>
+            <?php if (isAdmin()): ?>
+                <a href="admin.php" style="color: var(--accent-color); text-decoration: none; font-size: 0.9em; margin-right: 15px;">Admin Panel</a>
+            <?php endif; ?>
             <a href="logout.php" style="color: var(--danger-color); text-decoration: none; font-size: 0.9em;">ออกจากระบบ</a>
         </div>
     </header>
