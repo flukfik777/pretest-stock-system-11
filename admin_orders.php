@@ -95,6 +95,7 @@ if (isset($_GET['id'])) {
             <span style="color: var(--text-secondary);">ตรวจสอบรายการสั่งซื้อทั้งหมดจาก User</span>
         </div>
         <div>
+            <a href="profile.php" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9em; margin-right: 15px;">โปรไฟล์ของฉัน</a>
             <a href="admin.php" class="btn" style="background: transparent; border: 1px solid var(--accent-color); margin-right: 10px;">กลับหน้า Admin</a>
             <a href="logout.php" style="color: var(--danger-color); text-decoration: none;">ออกจากระบบ</a>
         </div>

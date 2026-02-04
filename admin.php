@@ -137,6 +137,7 @@ $totalValue = $pdo->query("SELECT SUM(price * stock_quantity) FROM products")->f
             <span style="color: var(--text-secondary);">ระบบจัดการหลังบ้าน</span>
         </div>
         <div>
+            <a href="profile.php" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9em; margin-right: 15px;">โปรไฟล์ของฉัน</a>
             <a href="index.php" class="btn" style="background: transparent; border: 1px solid var(--accent-color); margin-right: 10px;">กลับหน้าหลัก</a>
             <a href="logout.php" style="color: var(--danger-color); text-decoration: none;">ออกจากระบบ</a>
         </div>

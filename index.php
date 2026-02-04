@@ -160,6 +160,7 @@ foreach ($products as $p) {
                 <a href="cart.php" style="color: var(--accent-color); text-decoration: none; font-size: 0.9em; font-weight: 600; margin-right: 15px;">
                     ตะกร้า (<?php echo $cartCount; ?>)
                 </a>
+                <a href="profile.php" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9em; margin-right: 15px;">โปรไฟล์ของฉัน</a>
                 <?php if (isAdmin()): ?>
                     <a href="admin_orders.php" style="color: var(--accent-color); text-decoration: none; font-size: 0.9em; margin-right: 15px;">Manage Orders</a>
                     <a href="admin.php" style="color: var(--accent-color); text-decoration: none; font-size: 0.9em; margin-right: 15px;">Admin Panel</a>

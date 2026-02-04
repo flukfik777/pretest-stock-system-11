@@ -161,6 +161,7 @@ if (!empty($_SESSION['cart'])) {
             <span style="color: var(--text-secondary);">ตรวจสอบสินค้าและชำระเงิน</span>
         </div>
         <div>
+            <a href="profile.php" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9em; margin-right: 15px;">โปรไฟล์ของฉัน</a>
             <a href="index.php" class="btn" style="background: transparent; border: 1px solid var(--accent-color); margin-right: 10px;">ซื้อสินค้าเพิ่ม</a>
             <a href="logout.php" style="color: var(--danger-color); text-decoration: none;">ออกจากระบบ</a>
         </div>

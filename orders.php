@@ -84,6 +84,7 @@ if (isset($_GET['id'])) {
             <?php if (isAdmin()): ?>
                 <a href="admin_orders.php" class="btn" style="background: var(--text-secondary); color: #000; margin-right: 10px;">📦 จัดการออเดอร์ทั้งหมด</a>
             <?php endif; ?>
+            <a href="profile.php" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9em; margin-right: 15px;">โปรไฟล์ของฉัน</a>
             <a href="index.php" class="btn" style="background: transparent; border: 1px solid var(--accent-color); margin-right: 10px;">กลับหน้าหลัก</a>
             <a href="logout.php" style="color: var(--danger-color); text-decoration: none;">ออกจากระบบ</a>
         </div>
