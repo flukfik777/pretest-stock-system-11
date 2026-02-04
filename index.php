@@ -1,5 +1,10 @@
 <?php
 require 'db.php';
+require 'auth.php';
+
+// Enforce login
+requireLogin();
+$currentUser = getCurrentUser();
 
 // Auto-init DB for convenience
 try {
@@ -12,10 +17,30 @@ try {
         image_url VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+    
+    // Auto-create users table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(50) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+    // Insert initial users if empty
+    $check = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+    if ($check == 0) {
+        $adminPass = password_hash('admin123', PASSWORD_DEFAULT);
+        $userPass = password_hash('user123', PASSWORD_DEFAULT);
+        $pdo->exec("INSERT INTO users (username, password, role) VALUES 
+            ('admin', '$adminPass', 'admin'),
+            ('user', '$userPass', 'user')");
+    }
 } catch (PDOException $e) { /* Ignore if exists */ }
 
-// Handle POST actions
+// Handle POST actions (Admin only)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    requireAdmin(); // Double check role for actions
     if (isset($_POST['action'])) {
         if ($_POST['action'] === 'add') {
             $stmt = $pdo->prepare("INSERT INTO products (name, category, price, stock_quantity, image_url) VALUES (?, ?, ?, ?, ?)");
@@ -63,8 +88,14 @@ foreach ($products as $p) {
             <h1>ร้านประกอบคอมเทพ</h1>
             <span style="color: var(--text-secondary);">ระบบจัดการสินค้าในคลัง</span>
         </div>
-        <div>
-            <span style="color: var(--accent-color);">Admin: User</span>
+        <div style="text-align: right;">
+            <div style="color: var(--accent-color); font-weight: 600;">
+                <?php echo htmlspecialchars($currentUser['username']); ?> 
+                <span style="color: var(--text-secondary); font-size: 0.8em; font-weight: normal;">
+                    (<?php echo ucfirst($currentUser['role']); ?>)
+                </span>
+            </div>
+            <a href="logout.php" style="color: var(--danger-color); text-decoration: none; font-size: 0.9em;">ออกจากระบบ</a>
         </div>
     </header>
 
@@ -86,10 +117,12 @@ foreach ($products as $p) {
         </div>
     </div>
 
-    <!-- Actions -->
+    <!-- Actions (Admin Only) -->
+    <?php if (isAdmin()): ?>
     <div class="action-bar">
         <button class="btn" onclick="openModal()">+ เพิ่มสินค้าใหม่</button>
     </div>
+    <?php endif; ?>
 
     <!-- Product Grid -->
     <div class="product-grid">
@@ -105,11 +138,13 @@ foreach ($products as $p) {
                     <span class="<?php echo $product['stock_quantity'] < 5 ? 'low-stock' : ''; ?>">
                         คงเหลือ: <?php echo $product['stock_quantity']; ?> ชิ้น
                     </span>
+                    <?php if (isAdmin()): ?>
                     <form method="POST" onsubmit="return confirm('ยืนยันการลบสินค้า?');">
                         <input type="hidden" name="action" value="delete">
                         <input type="hidden" name="id" value="<?php echo $product['id']; ?>">
                         <button type="submit" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8em;">ลบ</button>
                     </form>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
