@@ -54,17 +54,44 @@ try {
             ('admin', '$adminPass', 'admin'),
             ('user', '$userPass', 'user')");
     }
+
+    // Auto-create orders table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS orders (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        total_amount DECIMAL(10, 2) NOT NULL,
+        status ENUM('pending', 'paid', 'shipped') DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+    // Auto-create order_items table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS order_items (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        order_id INT NOT NULL,
+        product_id INT NOT NULL,
+        quantity INT NOT NULL,
+        price DECIMAL(10, 2) NOT NULL,
+        FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
 } catch (PDOException $e) { /* Ignore if exists */ }
+
+// Initialize Cart
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
 
 // Enforce login
 requireLogin();
 $currentUser = getCurrentUser();
 
-// Handle POST actions (Admin only)
+// Handle POST actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    requireAdmin(); // Double check role for actions
     if (isset($_POST['action'])) {
         if ($_POST['action'] === 'add') {
+            requireAdmin();
             $stmt = $pdo->prepare("INSERT INTO products (name, category, price, stock_quantity, image_url) VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([
                 $_POST['name'],
@@ -74,13 +101,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_POST['image_url'] ?: 'https://placehold.co/300x300?text=No+Image'
             ]);
         } elseif ($_POST['action'] === 'delete') {
+            requireAdmin();
             $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
             $stmt->execute([$_POST['id']]);
+        } elseif ($_POST['action'] === 'add_to_cart') {
+            $product_id = $_POST['id'];
+            if (!isset($_SESSION['cart'][$product_id])) {
+                $_SESSION['cart'][$product_id] = 1;
+            } else {
+                $_SESSION['cart'][$product_id]++;
+            }
         }
         header("Location: index.php");
         exit;
     }
 }
+
+// Cart Count
+$cartCount = array_sum($_SESSION['cart']);
 
 // Fetch Products
 $products = $pdo->query("SELECT * FROM products ORDER BY id DESC")->fetchAll();
@@ -117,10 +155,17 @@ foreach ($products as $p) {
                     (<?php echo ucfirst($currentUser['role']); ?>)
                 </span>
             </div>
-            <?php if (isAdmin()): ?>
-                <a href="admin.php" style="color: var(--accent-color); text-decoration: none; font-size: 0.9em; margin-right: 15px;">Admin Panel</a>
-            <?php endif; ?>
-            <a href="logout.php" style="color: var(--danger-color); text-decoration: none; font-size: 0.9em;">ออกจากระบบ</a>
+            <div style="margin-top: 5px;">
+                <a href="orders.php" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9em; margin-right: 15px;">ออเดอร์ของฉัน</a>
+                <a href="cart.php" style="color: var(--accent-color); text-decoration: none; font-size: 0.9em; font-weight: 600; margin-right: 15px;">
+                    ตะกร้า (<?php echo $cartCount; ?>)
+                </a>
+                <?php if (isAdmin()): ?>
+                    <a href="admin_orders.php" style="color: var(--accent-color); text-decoration: none; font-size: 0.9em; margin-right: 15px;">Manage Orders</a>
+                    <a href="admin.php" style="color: var(--accent-color); text-decoration: none; font-size: 0.9em; margin-right: 15px;">Admin Panel</a>
+                <?php endif; ?>
+                <a href="logout.php" style="color: var(--danger-color); text-decoration: none; font-size: 0.9em;">ออกจากระบบ</a>
+            </div>
         </div>
     </header>
 
@@ -163,13 +208,20 @@ foreach ($products as $p) {
                     <span class="<?php echo $product['stock_quantity'] < 5 ? 'low-stock' : ''; ?>">
                         คงเหลือ: <?php echo $product['stock_quantity']; ?> ชิ้น
                     </span>
-                    <?php if (isAdmin()): ?>
-                    <form method="POST" onsubmit="return confirm('ยืนยันการลบสินค้า?');">
-                        <input type="hidden" name="action" value="delete">
-                        <input type="hidden" name="id" value="<?php echo $product['id']; ?>">
-                        <button type="submit" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8em;">ลบ</button>
-                    </form>
-                    <?php endif; ?>
+                    <div style="display: flex; gap: 5px;">
+                        <form method="POST">
+                            <input type="hidden" name="action" value="add_to_cart">
+                            <input type="hidden" name="id" value="<?php echo $product['id']; ?>">
+                            <button type="submit" class="btn" style="padding: 5px 10px; font-size: 0.8em;">ใส่ตะกร้า</button>
+                        </form>
+                        <?php if (isAdmin()): ?>
+                        <form method="POST" onsubmit="return confirm('ยืนยันการลบสินค้า?');">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="id" value="<?php echo $product['id']; ?>">
+                            <button type="submit" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8em;">ลบ</button>
+                        </form>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>

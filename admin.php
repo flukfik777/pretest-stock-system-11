@@ -52,6 +52,7 @@ $users = $pdo->query("SELECT id, username, role, created_at FROM users ORDER BY 
 // System Stats
 $totalProducts = $pdo->query("SELECT COUNT(*) FROM products")->fetchColumn();
 $totalUsers = count($users);
+$totalOrders = $pdo->query("SELECT COUNT(*) FROM orders")->fetchColumn();
 $totalValue = $pdo->query("SELECT SUM(price * stock_quantity) FROM products")->fetchColumn();
 
 ?>
@@ -71,8 +72,8 @@ $totalValue = $pdo->query("SELECT SUM(price * stock_quantity) FROM products")->f
         }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
             margin-bottom: 30px;
         }
         .stat-box {
@@ -154,6 +155,10 @@ $totalValue = $pdo->query("SELECT SUM(price * stock_quantity) FROM products")->f
             <div class="val"><?php echo $totalUsers; ?></div>
         </div>
         <div class="stat-box">
+            <h3>รายการสั่งซื้อ</h3>
+            <div class="val"><?php echo $totalOrders; ?></div>
+        </div>
+        <div class="stat-box">
             <h3>สินค้าทั้งหมด</h3>
             <div class="val"><?php echo $totalProducts; ?></div>
         </div>
@@ -166,7 +171,10 @@ $totalValue = $pdo->query("SELECT SUM(price * stock_quantity) FROM products")->f
     <section style="margin-bottom: 40px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h2 style="color: var(--accent-color);">จัดการผู้ใช้งาน</h2>
-            <button class="btn" onclick="document.getElementById('userModal').style.display='block'">+ เพิ่มผู้ใช้ใหม่</button>
+            <div>
+                <a href="admin_orders.php" class="btn" style="background: var(--text-secondary); color: #000; margin-right: 10px;">📦 ตรวจสอบการสั่งซื้อ</a>
+                <button class="btn" onclick="document.getElementById('userModal').style.display='block'">+ เพิ่มผู้ใช้ใหม่</button>
+            </div>
         </div>
         
         <table class="user-table">

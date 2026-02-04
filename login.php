@@ -177,6 +177,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <button type="submit" class="btn login-btn">เข้าสู่ระบบ</button>
     </form>
     
+    <div style="margin-top: 20px; text-align: center; font-size: 0.9em;">
+        <p style="color: var(--text-secondary);">ยังไม่มีบัญชี? <a href="register.php" style="color: var(--accent-color); text-decoration: none;">สมัครสมาชิก</a></p>
+    </div>
+
     <div style="margin-top: 30px; text-align: center; font-size: 0.8em; color: var(--text-secondary);">
         <p>Admin: admin / admin123</p>
         <p>User: user / user123</p>
