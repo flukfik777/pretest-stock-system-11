@@ -12,6 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_username = trim($_POST['username'] ?? '');
     $new_password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
+    $new_phone = trim($_POST['phone'] ?? '');
+    $new_address = trim($_POST['address'] ?? '');
 
     if ($new_username) {
         try {
@@ -30,11 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception("รหัสผ่านใหม่ไม่ตรงกัน");
                 }
                 $hashed = password_hash($new_password, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("UPDATE users SET username = ?, password = ? WHERE id = ?");
-                $stmt->execute([$new_username, $hashed, $_SESSION['user_id']]);
+                $stmt = $pdo->prepare("UPDATE users SET username = ?, password = ?, phone = ?, address = ? WHERE id = ?");
+                $stmt->execute([$new_username, $hashed, $new_phone, $new_address, $_SESSION['user_id']]);
             } else {
-                $stmt = $pdo->prepare("UPDATE users SET username = ? WHERE id = ?");
-                $stmt->execute([$new_username, $_SESSION['user_id']]);
+                $stmt = $pdo->prepare("UPDATE users SET username = ?, phone = ?, address = ? WHERE id = ?");
+                $stmt->execute([$new_username, $new_phone, $new_address, $_SESSION['user_id']]);
             }
 
             // Update Session
@@ -124,6 +126,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <label>ชื่อผู้ใช้</label>
                 <input type="text" name="username" value="<?php echo htmlspecialchars($currentUser['username']); ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label>เบอร์โทรศัพท์</label>
+                <input type="tel" name="phone" value="<?php echo htmlspecialchars($currentUser['phone'] ?? ''); ?>" placeholder="08x-xxx-xxxx">
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label>ที่อยู่สำหรับจัดส่ง</label>
+                <textarea name="address" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; box-sizing: border-box; transition: border-color 0.3s; height: 100px;" placeholder="บ้านเลขที่, ถนน, แขวง/ตำบล, เขต/อำเภอ, จังหวัด, รหัสไปรษณีย์"><?php echo htmlspecialchars($currentUser['address'] ?? ''); ?></textarea>
             </div>
             
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">

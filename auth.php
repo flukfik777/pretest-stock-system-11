@@ -24,9 +24,19 @@ function requireAdmin() {
 }
 
 function getCurrentUser() {
-    return [
-        'username' => $_SESSION['username'] ?? 'Guest',
-        'role' => $_SESSION['role'] ?? 'user'
+    global $pdo;
+    if (!isLoggedIn()) {
+        return [
+            'username' => 'Guest',
+            'role' => 'user'
+        ];
+    }
+    
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    return $stmt->fetch() ?: [
+        'username' => 'Guest',
+        'role' => 'user'
     ];
 }
 ?>
