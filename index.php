@@ -111,6 +111,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $_SESSION['cart'][$product_id]++;
             }
+        } elseif ($_POST['action'] === 'update_stock') {
+            requireAdmin();
+            $stmt = $pdo->prepare("UPDATE products SET stock_quantity = stock_quantity + ? WHERE id = ?");
+            $stmt->execute([$_POST['amount'], $_POST['id']]);
         }
         header("Location: index.php");
         exit;
@@ -143,32 +147,7 @@ foreach ($products as $p) {
 <body>
 
 <div class="container">
-    <header>
-        <div>
-            <h1>ร้านประกอบคอมเทพ</h1>
-            <span style="color: var(--text-secondary);">ระบบจัดการสินค้าในคลัง</span>
-        </div>
-        <div style="text-align: right;">
-            <div style="color: var(--accent-color); font-weight: 600;">
-                <?php echo htmlspecialchars($currentUser['username']); ?> 
-                <span style="color: var(--text-secondary); font-size: 0.8em; font-weight: normal;">
-                    (<?php echo ucfirst($currentUser['role']); ?>)
-                </span>
-            </div>
-            <div style="margin-top: 5px;">
-                <a href="orders.php" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9em; margin-right: 15px;">ออเดอร์ของฉัน</a>
-                <a href="cart.php" style="color: var(--accent-color); text-decoration: none; font-size: 0.9em; font-weight: 600; margin-right: 15px;">
-                    ตะกร้า (<?php echo $cartCount; ?>)
-                </a>
-                <a href="profile.php" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9em; margin-right: 15px;">โปรไฟล์ของฉัน</a>
-                <?php if (isAdmin()): ?>
-                    <a href="admin_orders.php" style="color: var(--accent-color); text-decoration: none; font-size: 0.9em; margin-right: 15px;">Manage Orders</a>
-                    <a href="admin.php" style="color: var(--accent-color); text-decoration: none; font-size: 0.9em; margin-right: 15px;">Admin Panel</a>
-                <?php endif; ?>
-                <a href="logout.php" style="color: var(--danger-color); text-decoration: none; font-size: 0.9em;">ออกจากระบบ</a>
-            </div>
-        </div>
-    </header>
+    <?php include 'navbar.php'; ?>
 
     <!-- Stats -->
     <div class="stats-panel">
@@ -216,6 +195,12 @@ foreach ($products as $p) {
                             <button type="submit" class="btn" style="padding: 5px 10px; font-size: 0.8em;">ใส่ตะกร้า</button>
                         </form>
                         <?php if (isAdmin()): ?>
+                        <form method="POST" style="display: inline;">
+                            <input type="hidden" name="action" value="update_stock">
+                            <input type="hidden" name="id" value="<?php echo $product['id']; ?>">
+                            <input type="hidden" name="amount" value="1">
+                            <button type="submit" class="btn" style="padding: 5px 10px; font-size: 0.8em; background: rgba(0, 255, 157, 0.2); color: var(--accent-color); border: 1px solid var(--accent-color);">+ เพิ่มสต็อก</button>
+                        </form>
                         <form method="POST" onsubmit="return confirm('ยืนยันการลบสินค้า?');">
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" value="<?php echo $product['id']; ?>">

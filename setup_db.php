@@ -66,7 +66,10 @@ try {
             ('Corsair RM850e 850W', 'Power Supply', 4800.00, 20, 'https://placehold.co/300x300/1a1a1a/00ff00?text=PSU'),
             ('ASUS ROG Thor 1000W', 'Power Supply', 12500.00, 5, 'https://placehold.co/300x300/1a1a1a/00ff00?text=PSU'),
             ('ROG Ryujin III 360', 'Cooling', 13900.00, 6, 'https://placehold.co/300x300/1a1a1a/00ff00?text=Cooler'),
-            ('Noctua NH-D15 chromax', 'Cooling', 4200.00, 10, 'https://placehold.co/300x300/1a1a1a/00ff00?text=Cooler');";
+            ('Noctua NH-D15 chromax', 'Cooling', 4200.00, 10, 'https://placehold.co/300x300/1a1a1a/00ff00?text=Cooler'),
+            ('Starter Gaming Set', 'Computer Set', 25900.00, 5, 'https://placehold.co/300x300/1a1a1a/00eeff?text=Starter+Set'),
+            ('Pro Streamer Set', 'Computer Set', 45900.00, 3, 'https://placehold.co/300x300/1a1a1a/ff3300?text=Pro+Set'),
+            ('Elite Workstation Set', 'Computer Set', 89900.00, 2, 'https://placehold.co/300x300/1a1a1a/00ff00?text=Elite+Set');";
         $pdo->exec($insertSql);
         echo "Inserted initial dummy data.<br>";
     }
